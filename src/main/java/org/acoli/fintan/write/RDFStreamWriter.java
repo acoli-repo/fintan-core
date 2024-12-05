@@ -174,17 +174,19 @@ public class RDFStreamWriter extends StreamWriter implements FintanStreamCompone
 				
 				if (prefixDeduplication) {
 					//write model into buffer
-					String outString = new String();
+					StringBuilder sbOut = new StringBuilder(512);
 					StringWriter buffer = new StringWriter();
 					m.write(buffer, lang);
 					
 					//put all prefix lines into an array, regular lines into outString
 					ArrayList<String> prefixCacheList = new ArrayList<String>();
 					for (String buffLine:buffer.toString().split("\n")) {
+						//--|| buffLine.trim().toLowerCase().startsWith("prefix")
+						// not needed since Jena consistently uses @prefix
 						if (buffLine.trim().startsWith("@prefix")) {
 							prefixCacheList.add(buffLine+"\n");
 						} else if (!buffLine.trim().isEmpty()) {
-								outString += buffLine+"\n";
+							sbOut.append(buffLine+"\n");
 						}
 					}
 					
@@ -199,9 +201,9 @@ public class RDFStreamWriter extends StreamWriter implements FintanStreamCompone
 					//add them to the current outString and update the temp-String
 					if (!prefixCacheTMP.equals(prefixCacheOut)) {
 						prefixCacheOut = prefixCacheTMP;
-						outString = prefixCacheTMP + outString;
+						sbOut.insert(0, prefixCacheTMP);
 					}
-					out.print(outString);
+					out.print(sbOut);
 				} else {
 					m.write(out, lang);
 				}

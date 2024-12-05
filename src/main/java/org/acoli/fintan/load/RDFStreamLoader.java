@@ -162,25 +162,26 @@ public class RDFStreamLoader extends StreamLoader implements FintanStreamCompone
 		
 		// process default stream
 		BufferedReader in = new BufferedReader(new InputStreamReader(getInputStream()));
-		String rdfsegment = "";
+		StringBuilder sb = new StringBuilder(512);
 		try {
 			for(String line = in.readLine(); line !=null; line=in.readLine()) {
 				if (split && segmentDelimiter == null) {
 					outputSegment(line+"\n", "");
 				} else if (split && line.equals(segmentDelimiter)) {
-					outputSegment(rdfsegment, "");
+					outputSegment(sb.toString(), "");
 
-					rdfsegment = "";
+					sb = new StringBuilder(512);
 				} else {
-					rdfsegment+=line+"\n";
+					sb.append(line+"\n");
 				}
 			}
 			//final segment in case there is no segmentDelimiter in last row
 		} catch (IOException e) {
 			LOG.trace("Error when reading from Stream: " +e);
 		}
-		if (!rdfsegment.trim().isEmpty())
-			outputSegment(rdfsegment, "");
+		String finalSegment = sb.toString();
+		if (!finalSegment.trim().isEmpty())
+			outputSegment(finalSegment, "");
 		getOutputStream().terminate();
 	}
 	
