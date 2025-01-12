@@ -891,13 +891,19 @@ public class RDFUpdater extends StreamRdfUpdater {
 		}
 		//terminate all threads
 		running = false;
-		for (UpdateThread t:updateThreads) {
-			if (t != null)
-			if(t.getState() == Thread.State.NEW) {
-				t.start(); //in case of spontaneous resurrection, new threads should not have any work to do at this point
-			} else if (!(t.getState() == Thread.State.TERMINATED)) {
-				synchronized(t) {
-					t.notify();
+		threadsRunning = true;
+		while(threadsRunning) {
+			threadsRunning = false;
+			for (UpdateThread t:updateThreads) {
+				if (t != null)
+				if(t.getState() == Thread.State.NEW) {
+					threadsRunning = true;
+					t.start(); //in case of spontaneous resurrection, new threads should not have any work to do at this point
+				} else if (t.getState() != Thread.State.TERMINATED) {
+					threadsRunning = true;
+					synchronized(t) {
+						t.notify(); //notify waiting threads to finish their work
+					}
 				}
 			}
 		}
@@ -959,7 +965,7 @@ public class RDFUpdater extends StreamRdfUpdater {
 			try {
 				getOutputStream().write(segtBufferOut.remove(0).getRight());
 			} catch (InterruptedException e) {
-				LOG.error("Resuming from interrupted thread when reading from default Stream: " +e);
+				LOG.error("Resuming from interrupted thread when writing to default Stream: " +e);
 			}
 		}
 	}

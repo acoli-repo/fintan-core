@@ -151,6 +151,10 @@ public class FintanManager {
 		else
 			componentStack.clear();
 		
+		//SET GLOBAL PARAMETERS
+		if (config.hasNonNull("modelQueueSize"))
+			FintanStreamHandler.QUEUE_SIZE = config.get("modelQueueSize").asInt(100);
+		
 
 		//BUILD DEFAULT "PIPELINE" including default I/O
 		if (config.hasNonNull("pipeline"))

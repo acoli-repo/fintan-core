@@ -30,8 +30,10 @@ import java.util.concurrent.BlockingQueue;
  */
 public class FintanStreamHandler<T> implements FintanInputStream<T>, FintanOutputStream<T> {
 
+	protected static int QUEUE_SIZE = 100;
+	
 	private boolean active = true;
-	private BlockingQueue<Object> queue = new ArrayBlockingQueue<Object>(100);
+	private BlockingQueue<Object> queue = new ArrayBlockingQueue<Object>(QUEUE_SIZE);
 	private static final Object POISON_PILL = new Object();
 	
 	
