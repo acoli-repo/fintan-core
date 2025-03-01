@@ -200,7 +200,7 @@ public class RDFStreamLoader extends StreamLoader implements FintanStreamCompone
 			m.read(new StringReader(rdfsegment), null, lang);
 		}
 		
-		if (!globalPrefixes || prefixCache.length()==0) 
+//		if (!globalPrefixes || prefixCache.length()==0) // speed impact is low. caching always is more robust, especially when reading multiple datasets with differing global prefixes
 			cachePrefixes(m.getNsPrefixMap());
 		try {
 			getOutputStream(outputStreamName).write(m);
